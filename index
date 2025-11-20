@@ -5,98 +5,220 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Uztura Kalkulators</title>
     <style>
-        body { font-family: Arial; max-width: 700px; margin: 40px auto; padding: 20px; background: #f8f9fa; }
-        input, select { padding: 10px; width: 100%; margin: 10px 0; box-sizing: border-box; }
-        button { background: #007bff; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
-        .result { margin-top: 30px; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --input-bg: #f0f0f0;
+            --button-bg: #007bff;
+            --button-text: #ffffff;
+            --accent: #4caf50;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --input-bg: #1e1e1e;
+            --button-bg: #0d47a1;
+            --accent: #66bb6a;
+            --shadow: rgba(255, 255, 255, 0.1);
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            transition: background 0.3s, color 0.3s;
+        }
+        h1 { text-align: center; margin-bottom: 30px; }
+        form { display: flex; flex-direction: column; gap: 15px; }
+        label { font-weight: bold; }
+        input, select {
+            padding: 10px;
+            background: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            border-radius: 5px;
+            transition: border 0.3s;
+        }
+        input:focus, select:focus { border-color: var(--accent); }
+        button {
+            background: var(--button-bg);
+            color: var(--button-text);
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        button:hover { background: #0056b3; }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--input-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px var(--shadow);
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .toggle-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px; width: 20px;
+            left: 2px; bottom: 2px;
+            background: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background: var(--accent); }
+        input:checked + .slider:before { transform: translateX(26px); }
+        
+        /* Responsīvs dizains */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            h1 { font-size: 24px; }
+            button { font-size: 14px; }
+        }
     </style>
 </head>
 <body>
+    <div class="toggle-container">
+        <label class="toggle">
+            <input type="checkbox" id="darkToggle" onclick="toggleDarkMode()">
+            <span class="slider"></span>
+        </label>
+        <span style="margin-left: 10px;">Tumšais režīms</span>
+    </div>
+
     <h1>Uztura Kalkulators</h1>
     
-    <label>Svars (kg):</label>
-    <input type="number" id="svars" value="78">
+    <form>
+        <label>Svars (kg):</label>
+        <input type="number" id="svars" value="78" min="1" required>
 
-    <label>Augums (cm):</label>
-    <input type="number" id="augums" value="166">
+        <label>Augums (cm):</label>
+        <input type="number" id="augums" value="166" min="1" required>
 
-    <label>Vecums (gadi):</label>
-    <input type="number" id="vecums" value="50">
+        <label>Vecums (gadi):</label>
+        <input type="number" id="vecums" value="50" min="1" required>
 
-    <label>Dzimums:</label>
-    <select id="dzimums">
-        <option value="V" selected>Vīrietis</option>
-        <option value="S">Sieviete</option>
-    </select>
+        <label>Dzimums:</label>
+        <select id="dzimums">
+            <option value="V" selected>Vīrietis</option>
+            <option value="S">Sieviete</option>
+        </select>
 
-    <label>Aktivitātes līmenis:</label>
-    <select id="aktivitate">
-        <option value="1.2">1.2 – Mazkustīgs</option>
-        <option value="1.375">1.375 – Viegla</option>
-        <option value="1.55" selected>1.55 – Vidēja</option>
-        <option value="1.725">1.725 – Augsta</option>
-        <option value="2.2">2.2+ – Ļoti augsta</option>
-    </select>
+        <label>Aktivitātes līmenis:</label>
+        <select id="aktivitate">
+            <option value="1.2">1.2 – Mazkustīgs</option>
+            <option value="1.375">1.375 – Viegla</option>
+            <option value="1.55">1.55 – Vidēja</option>
+            <option value="1.725">1.725 – Augsta</option>
+            <option value="2.2">2.2+ – Ļoti augsta</option>
+        </select>
 
-    <button onclick="aprekinat()">Aprēķināt!</button>
+        <button type="button" onclick="aprekinat()">Aprēķināt!</button>
+    </form>
 
     <div class="result" id="rezultats"></div>
 
     <script>
-    function aprekinat() {
-        const svars = parseFloat(document.getElementById("svars").value);
-        const augums = parseFloat(document.getElementById("augums").value);
-        const vecums = parseInt(document.getElementById("vecums").value);
-        const dzimums = document.getElementById("dzimums").value;
-        const aktivitates_faktors = parseFloat(document.getElementById("aktivitate").value);
-
-        // Šeit ir VISAS tās pašas formulas kā tavā Excel failā
-        const bmi = svars / ((augums / 100) ** 2);
-
-        const ibw = dzimums === "V" 
-            ? 50 + 2.3 * ((augums - 152.4) / 2.54)
-            : 45.5 + 2.3 * ((augums - 152.4) / 2.54);
-
-        const abw = bmi > 25 ? ibw + 0.4 * (svars - ibw) : svars;
-
-        const bmr = dzimums === "V"
-            ? 10 * svars + 6.25 * augums - 5 * vecums + 5
-            : 10 * svars + 6.25 * augums - 5 * vecums - 161;
-
-        const tdee = Math.round(bmr * aktivitates_faktors);
-
-        const proteina_koef = {1.2:1.2, 1.375:1.4, 1.55:1.6, 1.725:1.8, 2.2:2.2}[aktivitates_faktors] || 1.6;
-        const proteina_baze = bmi > 30 ? abw : svars;
-        const proteins = Math.round(proteina_baze * proteina_koef * 10) / 10;
-
-        const deficīts = bmi > 34 ? 750 : 500;
-        const kalorijas = tdee - deficīts;
-
-        let tauki = "", ogli = "", skidrumi = "";
-        if (bmi >= 25) {
-            const tauki_min = Math.round(kalorijas * 0.25 / 9);
-            const tauki_max = Math.round(kalorijas * 0.35 / 9);
-            const oh_min = Math.round((kalorijas - proteins*4 - tauki_max*9) / 4);
-            const oh_max = Math.round((kalorijas - proteins*4 - tauki_min*9) / 4);
-            tauki = `${tauki_min} – ${tauki_max} g`;
-            ogli = `${oh_min} – ${oh_max} g`;
-            skidrumi = `${(svars*30/1000).toFixed(1)} – ${(svars*40/1000).toFixed(1)} L`;
-        } else {
-            tauki = ogli = skidrumi = "Normāls svars – deficīts nav ieteicams";
+        // Tumšais režīms
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+        // Ielādē saglabāto izvēli
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkToggle').checked = true;
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkToggle').checked = true;
         }
 
-        document.getElementById("rezultats").innerHTML = `
-            <h2>Rezultāti</h2>
-            <p><strong>BMI:</strong> ${bmi.toFixed(1)}</p>
-            <p><strong>BMR:</strong> ${Math.round(bmr)} kcal</p>
-            <p><strong>TDEE (uzturēšanai):</strong> ${tdee} kcal</p>
-            <p><strong>Ieteicamās kalorijas svara nomešanai:</strong> ${kalorijas} kcal</p>
-            <p><strong>Proteīns:</strong> ${proteins} g</p>
-            <p><strong>Tauki:</strong> ${tauki}</p>
-            <p><strong>Ogļhidrāti:</strong> ${ogli}</p>
-            <p><strong>Šķidrums:</strong> ${skidrumi}</p>
-        `;
-    }
+        function aprekinat() {
+            const svars = parseFloat(document.getElementById("svars").value);
+            const augums = parseFloat(document.getElementById("augums").value);
+            const vecums = parseInt(document.getElementById("vecums").value);
+            const dzimums = document.getElementById("dzimums").value;
+            const aktivitates_faktors = parseFloat(document.getElementById("aktivitate").value);
+
+            if (isNaN(svars) || isNaN(augums) || isNaN(vecums)) {
+                alert("Lūdzu, ievadiet derīgus skaitļus!");
+                return;
+            }
+
+            // Formulas (tieši kā Excel)
+            const bmi = svars / ((augums / 100) ** 2);
+            const ibw = dzimums === "V" 
+                ? 50 + 2.3 * ((augums - 152.4) / 2.54)
+                : 45.5 + 2.3 * ((augums - 152.4) / 2.54);
+            const abw = bmi > 25 ? ibw + 0.4 * (svars - ibw) : svars;
+            const bmr = dzimums === "V"
+                ? 10 * svars + 6.25 * augums - 5 * vecums + 5
+                : 10 * svars + 6.25 * augums - 5 * vecums - 161;
+            const tdee = Math.round(bmr * aktivitates_faktors);
+
+            const proteina_koef = {1.2:1.2, 1.375:1.4, 1.55:1.6, 1.725:1.8, 2.2:2.2}[aktivitates_faktors] || 1.6;
+            const proteina_baze = bmi > 30 ? abw : svars;
+            const proteins = Math.round(proteina_baze * proteina_koef * 10) / 10;
+            const proteins_kcal = proteins * 4;
+
+            const deficīts = bmi > 34 ? 750 : 500;
+            const kalorijas = tdee - deficīts;
+
+            let tauki = "", ogli = "", skidrumi = "";
+            if (bmi >= 25) {
+                const tauki_min = Math.round(kalorijas * 0.25 / 9);
+                const tauki_max = Math.round(kalorijas * 0.35 / 9);
+                const oh_kcal_min = kalorijas - proteins_kcal - (tauki_max * 9);
+                const oh_kcal_max = kalorijas - proteins_kcal - (tauki_min * 9);
+                const oh_min = Math.round(oh_kcal_min / 4 * 10) / 10;
+                const oh_max = Math.round(oh_kcal_max / 4 * 10) / 10;
+                tauki = `${tauki_min} – ${tauki_max} g`;
+                ogli = `${oh_min} – ${oh_max} g`;
+                skidrumi = `${(svars * 30 / 1000).toFixed(2)} – ${(svars * 40 / 1000).toFixed(2)} litri`;
+            } else {
+                tauki = ogli = skidrumi = "Nav normāls svars – deficīts nav ieteicams";
+            }
+
+            document.getElementById("rezultats").innerHTML = `
+                <h2>Rezultāti</h2>
+                <p><strong>Ķermeņa masas indekss (BMI):</strong> ${bmi.toFixed(2)}</p>
+                <p><strong>Ideālais svars (IBW):</strong> ${ibw.toFixed(2)} kg</p>
+                <p><strong>Pielāgotais svars (ABW):</strong> ${abw.toFixed(2)} kg</p>
+                <p><strong>Bazālais metabolisms (BMR):</strong> ${bmr.toFixed(0)} kcal</p>
+                <p><strong>Kopējais enerģijas patēriņš (TDEE):</strong> ${tdee} kcal</p>
+                <p><strong>Kalorijas svara zaudēšanai:</strong> ${kalorijas} kcal (-${deficīts} kcal deficīts)</p>
+                <p><strong>Proteīns:</strong> ${proteins} g (${proteins_kcal} kcal)</p>
+                <p><strong>Tauki:</strong> ${tauki}</p>
+                <p><strong>Ogļhidrāti:</strong> ${ogli}</p>
+                <p><strong>Šķidrums:</strong> ${skidrumi}</p>
+            `;
+        }
     </script>
 </body>
 </html>
